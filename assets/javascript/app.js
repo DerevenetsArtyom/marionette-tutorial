@@ -1,8 +1,22 @@
-const Hello = Marionette.LayoutView.extend({
-    el: "#app-hook",
-    template: "#layout"
+const ToDo = Marionette.LayoutView.extend({
+    tagName: "li",
+    template: "#todo-item"
 });
 
-const hello = new Hello();
+const TodoList = Marionette.CollectionView.extend({
+    el: "#app-hook",
+    tagName:"ul",
 
-hello.render();
+    childView: ToDo
+});
+
+
+
+const todo = new TodoList({
+    collection : new Backbone.Collection([
+        {assignee: 'Scott', text: 'Write a book about Marionette'},
+        {assignee: 'Andrew', text: 'Do some coding'}
+    ])
+});
+
+todo.render();
