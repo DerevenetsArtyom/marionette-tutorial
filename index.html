@@ -5,16 +5,20 @@
   <body>
     <div id="app-hook"></div>
 
-    <script type="text/template" id="layout">
-      <ul>
-        <% _.each(items, function(item) { %>
-          <li><%- item.text %> &mdash; <%- item.assignee %></li>
-        <% }) %>
-      </ul>
-    </script>
-
     <script type="text/template" id="todo-item">
       <%- text %> &mdash; <%- assignee %>
+    </script>
+
+    <script type="text/template" id="todo-list">
+      <ul></ul>
+      <form>
+        <label for="id_text">Todo Text</label>
+        <input type="text" name="text" id="id_text" />
+        <label for="id_assignee">Assign to</label>
+        <input type="text" name="assignee" id="id_assignee" />
+
+        <button id="btn-add">Add Item</button>
+      </form>
     </script>
 
     <!-- Thirt-Party Libraries (Order matters) -->
