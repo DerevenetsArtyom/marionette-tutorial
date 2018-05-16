@@ -10,8 +10,49 @@ const TodoList = Marionette.CompositeView.extend({
     template: "#todo-list",
 
     childView: ToDo,
-    childViewContainer: "ul"
+    childViewContainer: "ul",
+
+    ui: {
+        assignee: '#id_assignee',
+        form: 'form',
+        text: '#id_text'
+    },
+
+    // when a jQuery event occurs, we can listen for it and fire a trigger
+    triggers: {
+        'submit @ui.form': 'add:todo:item'
+    },
+
+    // if I do that way, onAddTodoItem will be executed,
+    // but page will be reload for some reasons
+    // events: {
+    //     'submit @ui.form': 'onAddTodoItem'
+    // },
+
+    // The 'collectionEvents' allows us to listen to changes
+    // occurring on the attached 'this.collection' attribute.
+    // The value must exist as a method on this view
+    collectionEvents: {
+        add: 'itemAdded'
+    },
+
+    // This trigger is then converted to an 'onEventName' method and called.
+    // This method need not exist and is very powerful.
+    onAddTodoItem: function () {
+        const data = {
+            assignee: this.ui.assignee.val(),
+            text: this.ui.text.val()
+        };
+        this.collection.add(data);
+    },
+
+    // The method referenced in collectionEvents is called when the event is triggered
+    itemAdded: function () {
+        this.ui.assignee.val('');
+        this.ui.text.val('');
+    }
 });
+
 
 const todo = new TodoList({
     collection : new Backbone.Collection([
@@ -19,5 +60,6 @@ const todo = new TodoList({
         {assignee: 'Andrew', text: 'Do some coding'}
     ])
 });
+
 
 todo.render();
