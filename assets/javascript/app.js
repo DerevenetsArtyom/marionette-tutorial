@@ -1,16 +1,17 @@
+// represents single To-do item
 const ToDo = Marionette.LayoutView.extend({
     tagName: "li",
     template: "#todo-item"
 });
 
-const TodoList = Marionette.CollectionView.extend({
+// represents list of separate items and additional info
+const TodoList = Marionette.CompositeView.extend({
     el: "#app-hook",
-    tagName:"ul",
+    template: "#todo-list",
 
-    childView: ToDo
+    childView: ToDo,
+    childViewContainer: "ul"
 });
-
-
 
 const todo = new TodoList({
     collection : new Backbone.Collection([
