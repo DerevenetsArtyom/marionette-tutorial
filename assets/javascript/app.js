@@ -1,3 +1,29 @@
+const ToDoModel = Backbone.Model.extend({
+    defaults: {
+        assignee: '',
+        text: ''
+    },
+
+    validate: function(attrs) {
+        var errors = {};
+        var hasError = false;
+        if (!attrs.assignee) {
+            errors.assignee = 'assignee must be set';
+            hasError = true;
+        }
+        if (!attrs.text) {
+            errors.text = 'text must be set';
+            hasError = true;
+        }
+
+        if (hasError) {
+            console.log("errors", errors);
+            return errors;
+        }
+    }
+});
+
+
 // represents single To-do item
 const ToDo = Marionette.LayoutView.extend({
     tagName: "li",
@@ -43,11 +69,20 @@ const TodoList = Marionette.CompositeView.extend({
             assignee: this.ui.assignee.val(),
             text: this.ui.text.val()
         };
-        this.collection.add(data);
+        this.model.set(data);
+
+        if (this.model.isValid()) {
+            this.collection.add(this.model.toJSON());
+        }
     },
 
     // The method referenced in collectionEvents is called when the event is triggered
     itemAdded: function () {
+        this.model.set({
+            assignee: '',
+            text: ''
+        });
+
         this.ui.assignee.val('');
         this.ui.text.val('');
     }
@@ -58,7 +93,8 @@ const todo = new TodoList({
     collection : new Backbone.Collection([
         {assignee: 'Scott', text: 'Write a book about Marionette'},
         {assignee: 'Andrew', text: 'Do some coding'}
-    ])
+    ]),
+    model: new ToDoModel()
 });
 
 
