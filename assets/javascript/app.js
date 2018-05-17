@@ -1,3 +1,5 @@
+/// models
+
 const ToDoModel = Backbone.Model.extend({
     defaults: {
         assignee: '',
@@ -23,43 +25,54 @@ const ToDoModel = Backbone.Model.extend({
     }
 });
 
+
+/// views/list.js
+
+
 // represents single To-do item
-const ToDo = Marionette.LayoutView.extend({
+const TodoItemView = Marionette.LayoutView.extend({
     tagName: "li",
     template: "#todo-item"
 });
 
 // represents list of separate items and additional info
-const TodoListView = Marionette.CompositeView.extend({
-    el: "#app-hook",
-    template: "#todo-list",
+const TodoListView = Marionette.CollectionView.extend({
+    childView: TodoItemView,
+    tagName: "ul"
+});
 
-    childView: ToDo,
-    childViewContainer: "ul",
+
+/// views/form.js
+
+
+const FormView = Marionette.LayoutView.extend({
+    tagName: "form",
+    template: "#form",
 
     ui: {
         assignee: '#id_assignee',
-        form: 'form',
         text: '#id_text'
     },
 
     // when a jQuery event occurs, we can listen for it and fire a trigger
     triggers: {
-        'submit @ui.form': 'add:todo:item'
+        submit: 'add:todo:item'
     },
-
-    // if I do that way, onAddTodoItem will be executed,
-    // but page will be reload for some reasons
-    // events: {
-    //     'submit @ui.form': 'onAddTodoItem'
-    // },
 
     // The 'collectionEvents' allows us to listen to changes
     // occurring on the attached 'this.collection' attribute.
     // The value must exist as a method on this view
-    collectionEvents: {
-        add: 'itemAdded'
-    },
+    // collectionEvents: {
+    //     add: 'itemAdded'
+    // },
+
+    modelEvents: {
+        change: 'render'
+    }
+});
+
+
+
 
     // This trigger is then converted to an 'onEventName' method and called.
     // This method need not exist and is very powerful.
