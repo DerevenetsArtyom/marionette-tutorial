@@ -1,5 +1,3 @@
-/// models
-
 const ToDoModel = Backbone.Model.extend({
     defaults: {
         assignee: '',
@@ -28,14 +26,13 @@ const ToDoModel = Backbone.Model.extend({
 
 /// views/list.js
 
-
 // represents single To-do item
 const TodoItemView = Marionette.LayoutView.extend({
     tagName: "li",
     template: "#todo-item"
 });
 
-// represents list of separate items and additional info
+// represents list of items
 const TodoListView = Marionette.CollectionView.extend({
     childView: TodoItemView,
     tagName: "ul"
@@ -43,7 +40,6 @@ const TodoListView = Marionette.CollectionView.extend({
 
 
 /// views/form.js
-
 
 const FormView = Marionette.LayoutView.extend({
     tagName: "form",
@@ -59,27 +55,39 @@ const FormView = Marionette.LayoutView.extend({
         submit: 'add:todo:item'
     },
 
-    // The 'collectionEvents' allows us to listen to changes
-    // occurring on the attached 'this.collection' attribute.
-    // The value must exist as a method on this view
-    // collectionEvents: {
-    //     add: 'itemAdded'
-    // },
-
     modelEvents: {
         change: 'render'
     }
 });
 
 
+/// views/layout.js
 
+const Layout = Marionette.LayoutView.extend({
+    el: "#app-hook",
+    template: "#layout",
 
-    // This trigger is then converted to an 'onEventName' method and called.
-    // This method need not exist and is very powerful.
-    onAddTodoItem: function () {
+    regions: {
+        form: ".form",
+        list: ".list"
+    },
+
+    collectionEvents: {
+        add: 'itemAdded'
+    },
+
+    onShow: function () {
+        const formView = new FormView({model: this.model});
+        const listsView = new TodoListView({collection: this.collection});
+
+        this.showChildView("form", formView);
+        this.showChildView("list", listsView);
+    },
+
+    onChildviewAddTodoItem: function (child) {
         const data = {
-            assignee: this.ui.assignee.val(),
-            text: this.ui.text.val()
+            assignee: child.ui.assignee.val(),
+            text: child.ui.text.val()
         };
         this.model.set(data);
 
@@ -94,9 +102,6 @@ const FormView = Marionette.LayoutView.extend({
             assignee: '',
             text: ''
         });
-
-        this.ui.assignee.val('');
-        this.ui.text.val('');
     }
 });
 
@@ -107,7 +112,7 @@ const initialData = [
 
 const app = new Marionette.Application({
     onStart: function (options) {
-        const todo = new TodoListView({
+        const todo = new Layout({
             collection : new Backbone.Collection(options.initialData),
             model: new ToDoModel()
         });
