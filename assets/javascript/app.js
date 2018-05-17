@@ -23,7 +23,6 @@ const ToDoModel = Backbone.Model.extend({
     }
 });
 
-
 // represents single To-do item
 const ToDo = Marionette.LayoutView.extend({
     tagName: "li",
@@ -31,7 +30,7 @@ const ToDo = Marionette.LayoutView.extend({
 });
 
 // represents list of separate items and additional info
-const TodoList = Marionette.CompositeView.extend({
+const TodoListView = Marionette.CompositeView.extend({
     el: "#app-hook",
     template: "#todo-list",
 
@@ -88,14 +87,20 @@ const TodoList = Marionette.CompositeView.extend({
     }
 });
 
+const initialData = [
+    {assignee: 'Scott', text: 'Write a book about Marionette'},
+    {assignee: 'Andrew', text: 'Do some coding'}
+];
 
-const todo = new TodoList({
-    collection : new Backbone.Collection([
-        {assignee: 'Scott', text: 'Write a book about Marionette'},
-        {assignee: 'Andrew', text: 'Do some coding'}
-    ]),
-    model: new ToDoModel()
+const app = new Marionette.Application({
+    onStart: function (options) {
+        const todo = new TodoListView({
+            collection : new Backbone.Collection(options.initialData),
+            model: new ToDoModel()
+        });
+        todo.render();
+        todo.triggerMethod('show');
+    }
 });
 
-
-todo.render();
+app.start({initialData: initialData});
