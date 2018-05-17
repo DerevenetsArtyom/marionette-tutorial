@@ -9,6 +9,11 @@
       <%- text %> &mdash; <%- assignee %>
     </script>
 
+    <script type="text/template" id="layout">
+      <div class="list"></div>
+      <div class="form"></div>
+    </script>
+
     <script type="text/template" id="form">
       <label for="id_text">Todo Text</label>
       <input type="text" name="text" id="id_text" value="<%= text %>" />
