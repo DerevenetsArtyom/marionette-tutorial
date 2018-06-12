@@ -1,9 +1,15 @@
+// Next time start with
+// https://marionette.gitbooks.io/marionette-guides/content/en/views/collections.html
+// Reference
+// https://marionette.gitbooks.io/marionette-guides/content/en/appendix/approuter/router.html
+
+
 //////////////
 /// models ///
 //////////////
 
 const BlogModel = Backbone.Model.extend({
-    /** Let us inject 0 comments in from the data set */
+    // Let us inject 0 comments in from the data set
     defaults: function() {
         return {
             comments: []
@@ -21,17 +27,14 @@ const BlogCollection = Backbone.Collection.extend({
     model: BlogModel
 });
 
-
 const CommentCollection = Backbone.Collection.extend({
     model: CommentModel
 });
-
 
 /////////////////////
 /// views/list.js ///
 /////////////////////
 
-// represents single blog item
 const Entry = Marionette.LayoutView.extend({
     template: "#item",
     tagName: "li",
@@ -41,7 +44,6 @@ const Entry = Marionette.LayoutView.extend({
     }
 });
 
-// represents list of items
 const BlogList = Marionette.CollectionView.extend({
     childView: Entry,
     tagName: "ul",
@@ -62,12 +64,10 @@ const Comment = Marionette.LayoutView.extend({
     template: "#comment"
 });
 
-
 const CommentListView = Marionette.CollectionView.extend({
     tagName: "ol",
     childView: Comment
 });
-
 
 const Blog = Marionette.LayoutView.extend({
     template: "#blog",
@@ -93,7 +93,6 @@ const Blog = Marionette.LayoutView.extend({
     }
 });
 
-
 ///////////////////////
 /// views/layout.js ///
 ///////////////////////
@@ -117,7 +116,7 @@ const LayoutView = Marionette.LayoutView.extend({
 
         Backbone.history.navigate("blog/");
     },
-    
+
     onShowBlogEntry: function (entry) {
         const model = this.collection.get(entry);
         this.showBlog(model);
@@ -141,6 +140,59 @@ const LayoutView = Marionette.LayoutView.extend({
     }
 });
 
+/////////////////
+/// router.js ///
+/////////////////
+
+const Controller = Marionette.Object.extend({
+    initialize: function () {
+        // The region manager gives us a consistent UI and
+        // event triggers across our different layouts.
+        this.options.regionManager = new Marionette.RegionManager({
+            regions: {
+                main: "#blog-hook"
+            }
+        });
+
+        const initailData = this.getOption("initialData");
+
+        const layout = new LayoutView({
+            collection: new BlogCollection(initailData.posts)
+        });
+
+        this.getOption("regionManager").get("main").show(layout);
+
+        // We want easy access to our root view later
+        this.options.layout = layout;
+    },
+
+    // List all blog entries with a summary
+    blogList: function () {
+        const layout = this.getOption("layout");
+        layout.triggerMethod("show:blog:list ")
+    },
+
+    // List a named entry with its comments underneath
+    blogEntry: function(entry) {
+        const layout = this.getOption('layout');
+        layout.triggerMethod('show:blog:entry', entry);
+    }
+});
+
+const Router = Marionette.AppRouter.extend({
+    appRoutes: {
+        'blog/': 'blogList',
+        'blog/:entry': 'blogEntry'
+    },
+
+    // Initialize our controller with the options
+    // passed into the application, such as the initial posts list.
+    initialize: function() {
+        this.controller = new Controller({
+            initialData: this.getOption('initialData')
+        })
+    }
+});
 
 /// driver.js - entrypoint for whole application
 
