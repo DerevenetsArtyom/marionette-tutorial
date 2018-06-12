@@ -1,3 +1,32 @@
+//////////////
+/// models ///
+//////////////
+
+const BlogModel = Backbone.Model.extend({
+    /** Let us inject 0 comments in from the data set */
+    defaults: function() {
+        return {
+            comments: []
+        }
+    }
+});
+
+const CommentModel = Backbone.Model.extend();
+
+///////////////////
+/// collections ///
+///////////////////
+
+const BlogCollection = Backbone.Collection.extend({
+    model: BlogModel
+});
+
+
+const CommentCollection = Backbone.Collection.extend({
+    model: CommentModel
+});
+
+
 /////////////////////
 /// views/list.js ///
 /////////////////////
@@ -63,11 +92,6 @@ const Blog = Marionette.LayoutView.extend({
         this.showChildView('comments', commentsView)
     }
 });
-
-// На книжной полке стоят два тома Пушкина, первый и второй.
-// Толщина страниц каждого тома — 2 см, а каждой обложки — 2 мм.
-// Книжный червь сидел на первой странице первого тома и прогрыз (по кратчайшему пути) до последней страницы второго.
-// Какое расстояние он прогрыз?
 
 
 ///////////////////////
