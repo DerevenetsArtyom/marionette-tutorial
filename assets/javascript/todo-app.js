@@ -105,6 +105,8 @@ const Layout = Marionette.LayoutView.extend({
     }
 });
 
+/// driver.js - entrypoint for whole application
+
 const initialData = [
     {assignee: 'Scott', text: 'Write a book about Marionette'},
     {assignee: 'Andrew', text: 'Do some coding'}
