@@ -107,19 +107,36 @@ const Layout = Marionette.LayoutView.extend({
 
 /// driver.js - entrypoint for whole application
 
-const initialData = [
-    {assignee: 'Scott', text: 'Write a book about Marionette'},
-    {assignee: 'Andrew', text: 'Do some coding'}
-];
+const initialData = {
+  posts: [
+    {
+      author: 'Scott',
+      title: 'Why Marionette is amazing',
+      content: '...',
+      id: 42,
+      comments: [
+        {
+          author: 'Steve',
+          content: '...',
+          id: 56
+        }
+      ]
+    },
+    {
+      author: 'Andrew',
+      title: 'How to use Routers',
+      content: '...',
+      id: 17
+    }
+  ]
+};
 
 const app = new Marionette.Application({
     onStart: function (options) {
-        const todo = new Layout({
-            collection : new Backbone.Collection(options.initialData),
-            model: new ToDoModel()
-        });
-        todo.render();
-        todo.triggerMethod('show');
+        const router = new Router(options);
+
+        /** Starts the URL handling framework */
+        Backbone.history.start();
     }
 });
 
