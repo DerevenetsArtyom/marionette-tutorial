@@ -1,4 +1,6 @@
-/// views/list.js
+/////////////////////
+/// views/list.js ///
+/////////////////////
 
 // represents single blog item
 const Entry = Marionette.LayoutView.extend({
@@ -22,7 +24,46 @@ const BlogList = Marionette.CollectionView.extend({
 });
 
 
-/// views/form.js
+/////////////////////
+/// views/blog.js ///
+/////////////////////
+
+const Comment = Marionette.LayoutView.extend({
+    tagName: "li",
+    template: "#comment"
+});
+
+
+const CommentListView = Marionette.CollectionView.extend({
+    tagName: "ol",
+    childView: Comment
+});
+
+
+const Blog = Marionette.LayoutView.extend({
+    template: "#blog",
+
+    regions: {
+        comments: "#comment-hook"
+    },
+
+    ui: {
+        back: ".back"
+    },
+
+    triggers: {
+        "click @ui.back": "show:blog:list"
+    },
+
+    onShow: function () {
+        // TODO wtf?
+        const comments = new CommentList(this.model.get('comments'));
+        const commentsView = new CommentListView({collection: comments});
+
+        this.showChildView('comments', commentsView)
+    }
+});
+
 
 /// views/layout.js
 
