@@ -40,7 +40,6 @@ const BlogListView = Marionette.CollectionView.extend({
     childView: EntryItemView,
     tagName: "ul",
 
-    // should respond on 'select:entry' event inside childView ?
     onChildviewSelectEntry: function (child, options) {
         this.triggerMethod("select:entry", child.model)
     }
@@ -85,19 +84,15 @@ const BlogView = Marionette.LayoutView.extend({
 const LayoutView = Marionette.LayoutView.extend({
     template: "#layout",
 
-    regions: {
-        layout: ".layout-hook"
-    },
+    regions: { layout: ".layout-hook" },
 
     onShowBlogList: function () {
-        console.log('LayoutView onShowBlogList');
         const list = new BlogListView({collection: this.collection});
         this.showChildView("layout", list);
         Backbone.history.navigate("blog/");
     },
 
     onShowBlogEntry: function (entry) {
-        console.log('LayoutView onShowBlogEntry');
         const model = this.collection.get(entry);
         this.showBlog(model);
     },
@@ -116,7 +111,7 @@ const LayoutView = Marionette.LayoutView.extend({
         const blog = new BlogView({model: blogModel});
         this.showChildView('layout', blog);
 
-        Backbone.history.navigate("blog/" + blog.id);
+        Backbone.history.navigate("blog/" + blogModel.id);
     }
 });
 
