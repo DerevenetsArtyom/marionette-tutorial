@@ -1,9 +1,3 @@
-// Next time start with
-// https://marionette.gitbooks.io/marionette-guides/content/en/views/collections.html
-// Reference
-// https://marionette.gitbooks.io/marionette-guides/content/en/appendix/approuter/router.html
-
-
 //////////////
 /// models ///
 //////////////
@@ -35,20 +29,18 @@ const CommentCollection = Backbone.Collection.extend({
 /// views/list.js ///
 /////////////////////
 
-const Entry = Marionette.LayoutView.extend({
+const EntryItemView = Marionette.LayoutView.extend({
     template: "#item",
     tagName: "li",
 
-    triggers: {
-      click: "select:entry"
-    }
+    triggers: { click: "select:entry" }
 });
 
-const BlogList = Marionette.CollectionView.extend({
-    childView: Entry,
+const BlogListView = Marionette.CollectionView.extend({
+    childView: EntryItemView,
     tagName: "ul",
 
-    // todo: what a hell?
+    // should respond on 'select:entry' event inside childView ?
     onChildviewSelectEntry: function (child, options) {
         this.triggerMethod("select:entry", child.model)
     }
@@ -59,34 +51,27 @@ const BlogList = Marionette.CollectionView.extend({
 /// views/blog.js ///
 /////////////////////
 
-const Comment = Marionette.LayoutView.extend({
+const CommentItemView = Marionette.LayoutView.extend({
     tagName: "li",
     template: "#comment"
 });
 
 const CommentListView = Marionette.CollectionView.extend({
     tagName: "ol",
-    childView: Comment
+    childView: CommentItemView
 });
 
-const Blog = Marionette.LayoutView.extend({
+const BlogView = Marionette.LayoutView.extend({
     template: "#blog",
 
-    regions: {
-        comments: "#comment-hook"
-    },
+    regions: { comments: ".comment-hook" },
 
-    ui: {
-        back: ".back"
-    },
+    ui: { back: ".back" },
 
-    triggers: {
-        "click @ui.back": "show:blog:list"
-    },
+    triggers: { "click @ui.back": "show:blog:list" },
 
     onShow: function () {
-        // TODO wtf?
-        const comments = new CommentList(this.model.get('comments'));
+        const comments = new CommentCollection(this.model.get('comments'));
         const commentsView = new CommentListView({collection: comments});
 
         this.showChildView('comments', commentsView)
@@ -105,19 +90,14 @@ const LayoutView = Marionette.LayoutView.extend({
     },
 
     onShowBlogList: function () {
-        const list = BlogList({collection: this.collection});
+        console.log('LayoutView onShowBlogList');
+        const list = new BlogListView({collection: this.collection});
         this.showChildView("layout", list);
-
-        /*
-        Remember - this only sets the fragment,
-        so we can safely call this as
-        often as we like with no negative side-effects.
-        */
-
         Backbone.history.navigate("blog/");
     },
 
     onShowBlogEntry: function (entry) {
+        console.log('LayoutView onShowBlogEntry');
         const model = this.collection.get(entry);
         this.showBlog(model);
     },
@@ -133,7 +113,7 @@ const LayoutView = Marionette.LayoutView.extend({
 
     // Share some simple logic from our subviews
     showBlog: function (blogModel) {
-        const blog = new Blog({model: blogModel});
+        const blog = new BlogView({model: blogModel});
         this.showChildView('layout', blog);
 
         Backbone.history.navigate("blog/" + blog.id);
@@ -149,9 +129,7 @@ const Controller = Marionette.Object.extend({
         // The region manager gives us a consistent UI and
         // event triggers across our different layouts.
         this.options.regionManager = new Marionette.RegionManager({
-            regions: {
-                main: "#blog-hook"
-            }
+            regions: { main: "#blog-hook" }
         });
 
         const initailData = this.getOption("initialData");
@@ -168,12 +146,14 @@ const Controller = Marionette.Object.extend({
 
     // List all blog entries with a summary
     blogList: function () {
+        console.log('Controller blogList');
         const layout = this.getOption("layout");
-        layout.triggerMethod("show:blog:list ")
+        layout.triggerMethod("show:blog:list")
     },
 
     // List a named entry with its comments underneath
     blogEntry: function(entry) {
+        console.log('Controller blogEntry');
         const layout = this.getOption('layout');
         layout.triggerMethod('show:blog:entry', entry);
     }
@@ -223,8 +203,6 @@ const initialData = {
 const app = new Marionette.Application({
     onStart: function (options) {
         const router = new Router(options);
-
-        /** Starts the URL handling framework */
         Backbone.history.start();
     }
 });
